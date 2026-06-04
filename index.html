@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SparkChat — Join the Waitlist</title>
+  <meta name="description" content="SparkChat is at capacity right now. Join the waitlist and we'll let you know the moment a spot opens up." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0A0A1A;
+      --surface:    #12112A;
+      --border:     rgba(139, 63, 255, 0.18);
+      --rose:       #C2185B;
+      --violet:     #8B3FFF;
+      --violet-light: #C099FF;
+      --gold:       #FF9800;
+      --text:       #F8F0FF;
+      --muted:      rgba(248, 240, 255, 0.55);
+      --input-bg:   rgba(255, 255, 255, 0.05);
+      --input-border: rgba(139, 63, 255, 0.35);
+      --input-focus: rgba(139, 63, 255, 0.7);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient glow blobs */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+    }
+    .blob-1 { width: 500px; height: 500px; background: var(--violet); top: -120px; left: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: var(--rose); bottom: -80px; right: -80px; }
+    .blob-3 { width: 300px; height: 300px; background: var(--gold); top: 40%; left: 50%; transform: translateX(-50%); opacity: 0.10; }
+
+    /* Ember particles */
+    .embers {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .ember {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0;
+      animation: float-up linear infinite;
+    }
+    @keyframes float-up {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
+    }
+
+    /* Layout */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 60px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 48px 40px 40px;
+      box-shadow: 0 0 60px rgba(139, 63, 255, 0.12), 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* Logo */
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .logo-wrap img {
+      width: 130px;
+      height: auto;
+      filter: drop-shadow(0 0 20px rgba(139, 63, 255, 0.5));
+    }
+
+    /* Heading */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(194, 24, 91, 0.15);
+      border: 1px solid rgba(194, 24, 91, 0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FF6B9D;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #FF6B9D;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #6A1FCC, #C099FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin-bottom: 28px;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--violet-light);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+    .optional-tag {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 6px;
+    }
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="email"]::placeholder,
+    input[type="tel"]::placeholder {
+      color: rgba(248, 240, 255, 0.3);
+    }
+    input[type="email"]:focus,
+    input[type="tel"]:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(139, 63, 255, 0.15);
+    }
+    input[type="email"].error,
+    input[type="tel"].error {
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .field-error {
+      font-size: 12px;
+      color: #FF6B6B;
+      margin-top: 6px;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      margin-top: 8px;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6A1FCC, #8B3FFF);
+      box-shadow: 0 4px 20px rgba(139, 63, 255, 0.4);
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.2px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      opacity: 0.92;
+      box-shadow: 0 6px 28px rgba(139, 63, 255, 0.6);
+    }
+    .btn-submit:active:not(:disabled) { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-submit .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: block; }
+
+    /* Success state */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+    .success-icon {
+      font-size: 52px;
+      margin-bottom: 16px;
+      animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .success-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .success-msg {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Error banner */
+    .error-banner {
+      display: none;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #FF6B6B;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .error-banner.visible { display: block; }
+
+    /* Already on list banner */
+    .info-banner {
+      display: none;
+      background: rgba(139, 63, 255, 0.12);
+      border: 1px solid rgba(139, 63, 255, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--violet-light);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .info-banner.visible { display: block; }
+
+    /* Footer */
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .footer a {
+      color: var(--violet-light);
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .card { padding: 36px 24px 32px; border-radius: 24px; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background -->
+  <div class="ambient">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div class="embers" id="embers"></div>
+
+  <div class="page">
+    <div class="card">
+
+      <!-- Logo -->
+      <div class="logo-wrap">
+        <img src="sparkchat-logo.png" alt="SparkChat" />
+      </div>
+
+      <!-- Form section -->
+      <div id="form-section">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          At Capacity
+        </div>
+
+        <h1><span>Thanks for being early.</span></h1>
+        <p class="subtitle">SparkChat is growing fast and spots are limited right now. Drop your details below and we'll reach out the moment a spot opens up.</p>
+
+        <div class="divider"></div>
+
+        <div class="error-banner" id="error-banner"></div>
+        <div class="info-banner" id="info-banner"></div>
+
+        <form id="waitlist-form" novalidate>
+          <div class="form-group">
+            <label for="email">Email <span class="optional-tag">optional</span></label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+            <div class="field-error" id="email-error">Please enter a valid email address.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone number <span class="optional-tag">optional</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="+61 4XX XXX XXX" autocomplete="tel" />
+            <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
+            <div class="field-hint">At least one of email or phone is required.</div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span class="btn-text">🔥 Join the Waitlist</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- Success section -->
+      <div class="success-state" id="success-section">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">You're on the list!</div>
+        <p class="success-msg">We'll reach out as soon as a spot opens up. Thanks for your patience — SparkChat is worth the wait.</p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        By joining you agree to our
+        <a href="https://poachalabs.com/privacy.html" target="_blank">Terms of Use &amp; Privacy Policy</a>.<br />
+        &copy; 2025 Poacha Labs Pty Ltd
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ── Ember particles ──────────────────────────────────────────────
+    const emberContainer = document.getElementById('embers');
+    for (let i = 0; i < 18; i++) {
+      const e = document.createElement('div');
+      e.className = 'ember';
+      e.style.left = Math.random() * 100 + 'vw';
+      e.style.bottom = '-10px';
+      e.style.animationDuration = (6 + Math.random() * 10) + 's';
+      e.style.animationDelay = (Math.random() * 12) + 's';
+      e.style.width = e.style.height = (2 + Math.random() * 3) + 'px';
+      e.style.opacity = '0';
+      emberContainer.appendChild(e);
+    }
+
+    // ── Form logic ───────────────────────────────────────────────────
+    const API = 'https://sparkchat-render-backend.onrender.com/api/waitlist';
+
+    const form        = document.getElementById('waitlist-form');
+    const submitBtn   = document.getElementById('submit-btn');
+    const errorBanner = document.getElementById('error-banner');
+    const infoBanner  = document.getElementById('info-banner');
+    const emailInput  = document.getElementById('email');
+    const phoneInput  = document.getElementById('phone');
+    const emailErr    = document.getElementById('email-error');
+    const phoneErr    = document.getElementById('phone-error');
+
+    function clearErrors() {
+      errorBanner.classList.remove('visible');
+      infoBanner.classList.remove('visible');
+      emailErr.classList.remove('visible');
+      phoneErr.classList.remove('visible');
+      emailInput.classList.remove('error');
+      phoneInput.classList.remove('error');
+    }
+
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+    }
+    function isValidPhone(v) {
+      return /^[\+\d\s\-\(\)]{7,20}$/.test(v.trim());
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const email = emailInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      // Validate: at least one required
+      if (!email && !phone) {
+        errorBanner.textContent = 'Please provide at least your email or phone number.';
+        errorBanner.classList.add('visible');
+        return;
+      }
+      if (email && !isValidEmail(email)) {
+        emailInput.classList.add('error');
+        emailErr.classList.add('visible');
+        return;
+      }
+      if (phone && !isValidPhone(phone)) {
+        phoneInput.classList.add('error');
+        phoneErr.classList.add('visible');
+        return;
+      }
+
+      // Submit
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        const body = {};
+        if (email) body.email = email;
+        if (phone) body.phoneNumber = phone;
+
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+
+        if (res.status === 409) {
+          // Already on waitlist
+          infoBanner.textContent = "You're already on the waitlist! We'll be in touch soon.";
+          infoBanner.classList.add('visible');
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Something went wrong. Please try again.');
+        }
+
+        // Success
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('success-section').style.display = 'block';
+
+      } catch (err) {
+        errorBanner.textContent = err.message || 'Something went wrong. Please try again.';
+        errorBanner.classList.add('visible');
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
