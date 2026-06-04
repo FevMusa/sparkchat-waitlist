@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete My Account — SparkChat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0A0015;
+      color: #F8F0FF;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #1A0035, #0E0E1F);
+      border: 1px solid rgba(139, 63, 255, 0.25);
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      display: block;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #F8F0FF;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: rgba(248, 240, 255, 0.6);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .what-gets-deleted {
+      background: rgba(139, 63, 255, 0.08);
+      border: 1px solid rgba(139, 63, 255, 0.2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+
+    .what-gets-deleted h2 {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(192, 153, 255, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .what-gets-deleted ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .what-gets-deleted li {
+      font-size: 14px;
+      color: rgba(248, 240, 255, 0.75);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .what-gets-deleted li::before {
+      content: '✓';
+      color: #8B3FFF;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(139, 63, 255, 0.3);
+      border-radius: 14px;
+      color: #F8F0FF;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(248, 240, 255, 0.3);
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(139, 63, 255, 0.7);
+    }
+
+    .confirm-label {
+      font-size: 13px;
+      color: rgba(248, 240, 255, 0.5);
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .confirm-note {
+      font-size: 12px;
+      color: rgba(248, 240, 255, 0.35);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .delete-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #7B1FA2, #EF4444);
+      border: none;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .delete-btn:hover { opacity: 0.9; }
+    .delete-btn:active { transform: scale(0.98); }
+    .delete-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .cancel-link {
+      display: block;
+      margin-top: 16px;
+      font-size: 14px;
+      color: rgba(248, 240, 255, 0.4);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .cancel-link:hover { color: rgba(248, 240, 255, 0.7); }
+
+    /* States */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .error-msg {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #FCA5A5;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img src="sparkchat-logo.png" alt="SparkChat" class="logo" />
+
+    <!-- Default state: form -->
+    <div id="state-form" class="state active">
+      <h1>Delete My Account</h1>
+      <p class="subtitle">
+        This will permanently delete your SparkChat account and all associated data. This action cannot be undone.
+      </p>
+
+      <div class="what-gets-deleted">
+        <h2>What gets deleted</h2>
+        <ul>
+          <li>Your tone preferences and personalisation data</li>
+          <li>Your liked responses and interaction history</li>
+          <li>Your subscription record (cancels active subscription)</li>
+          <li>All account data stored on our servers</li>
+        </ul>
+      </div>
+
+      <div id="error-msg" class="error-msg"></div>
+
+      <div class="input-group">
+        <p class="confirm-label">Your SparkChat User ID</p>
+        <input
+          type="text"
+          id="user-id-input"
+          placeholder="Paste your User ID here"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <p class="confirm-note">
+        Your User ID can be found in the SparkChat app under Menu → My Account. It looks like a long string of letters and numbers.
+      </p>
+
+      <button class="delete-btn" id="delete-btn" onclick="handleDelete()">
+        Delete My Account Permanently
+      </button>
+
+      <a class="cancel-link" onclick="window.history.back()">← Go back</a>
+    </div>
+
+    <!-- Loading state -->
+    <div id="state-loading" class="state">
+      <h1>Deleting your account…</h1>
+      <p class="subtitle" style="margin-top: 20px;">
+        <span class="spinner"></span> Please wait, this only takes a moment.
+      </p>
+    </div>
+
+    <!-- Success state -->
+    <div id="state-success" class="state">
+      <div class="success-icon">✓</div>
+      <h1>Account Deleted</h1>
+      <p class="subtitle" style="margin-top: 12px;">
+        Your SparkChat account and all associated data have been permanently deleted. You can now safely delete the app.
+      </p>
+      <p class="subtitle" style="margin-top: 8px; font-size: 13px;">
+        If you had an active subscription, it has been cancelled. No further charges will be made.
+      </p>
+    </div>
+
+    <!-- Error state -->
+    <div id="state-error" class="state">
+      <div class="success-icon" style="font-size: 40px;">⚠️</div>
+      <h1>Something went wrong</h1>
+      <p class="subtitle" id="error-detail" style="margin-top: 12px;">
+        We couldn't find an account with that User ID. Please check the ID and try again.
+      </p>
+      <button class="delete-btn" style="margin-top: 24px; background: linear-gradient(90deg, #5B0FBE, #8B3FFF);" onclick="showState('form')">
+        Try Again
+      </button>
+      <p class="subtitle" style="margin-top: 16px; font-size: 13px;">
+        Still having trouble? Email us at <a href="mailto:Hi@poachalabs.com" style="color: #C099FF;">Hi@poachalabs.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = 'https://sparkchat-render-backend.onrender.com';
+
+    function showState(name) {
+      document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+      document.getElementById('state-' + name).classList.add('active');
+    }
+
+    async function handleDelete() {
+      const userId = document.getElementById('user-id-input').value.trim();
+      const errorEl = document.getElementById('error-msg');
+
+      errorEl.style.display = 'none';
+
+      if (!userId) {
+        errorEl.textContent = 'Please enter your User ID to continue.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      // Basic MongoDB ObjectId format check (24 hex chars)
+      if (!/^[a-f0-9]{24}$/i.test(userId)) {
+        errorEl.textContent = 'That doesn\'t look like a valid User ID. It should be 24 characters (letters and numbers).';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      showState('loading');
+
+      try {
+        const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (response.ok) {
+          showState('success');
+        } else if (response.status === 404) {
+          document.getElementById('error-detail').textContent =
+            'We couldn\'t find an account with that User ID. Please double-check the ID in the app and try again.';
+          showState('error');
+        } else {
+          document.getElementById('error-detail').textContent =
+            'An unexpected error occurred. Please try again or contact us at Hi@poachalabs.com.';
+          showState('error');
+        }
+      } catch (err) {
+        document.getElementById('error-detail').textContent =
+          'Could not connect to the server. Please check your internet connection and try again.';
+        showState('error');
+      }
+    }
+  </script>
+
+</body>
+</html>
